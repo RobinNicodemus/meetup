@@ -10,16 +10,36 @@ class Event extends Component {
     }
 
     render() {
-        let details;
+        const event = this.props.event;
+        const group = event.group;
+        const venue = event.venue;
 
         return (
             <div className="event">
-                <h2 className="eventTitle">{this.props.event.name}</h2>
-                {this.state.showDetails &&
-                    <div className="eventDetails"></div>
+                <div className="eventHead">
+                    <p className="eventTitle">{event.name}</p>
+                    <div className="eventDate">{event.local_date}</div>
+                </div>
+                {
+                    !this.state.showDetails &&
+                    <div className="descriptionStub" dangerouslySetInnerHTML={{ __html: event.description }}></div>
                 }
-                <button onClick={this.toggleDetails} className="detailsButton"></button>
-            </div>
+                {
+                    this.state.showDetails &&
+                    <div className="eventDetails">
+                        {group && <div className="eventGroup">{group.name}</div>}
+                        <div className="eventDescription" dangerouslySetInnerHTML={{ __html: event.description }}></div>
+                        <div className="eventFooter">
+                            <div className="eventTime">{event.local_time}</div>
+                            {venue && <div className="eventPlace">
+                                <div className="eventVenue">{venue.name}</div>
+                                <div className="eventAddress">{venue.address_1}</div>
+                            </div>}
+                        </div>
+                    </div>
+                }
+                <button onClick={this.toggleDetails} className="detailsButton">Details</button>
+            </div >
         );
     }
 }
