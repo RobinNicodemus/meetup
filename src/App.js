@@ -53,14 +53,6 @@ class App extends Component {
         this.setState({ events, lat, lon })
       );
     }
-
-    //  if (lat && lon) {
-    //    getEvents(lat, lon, this.state.page).then(events =>
-    //      this.setState({ events, lat, lon })
-    //    );
-    //  } else { 
-    //    getEvents(this.state.lat, this.state.lon, page).then(events => this.setState({ events }));
-    //  }
   }
 
   updatePage = (page) => {
