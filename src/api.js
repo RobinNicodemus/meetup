@@ -43,6 +43,11 @@ async function getEvents(lat, lon, page) {
         return mockEvents.events;
     }
 
+    if (!navigator.onLine) {
+        const events = localStorage.getItem('lastEvents');
+        return JSON.parse(events);
+    }
+
     const token = await getAccessToken();
     if (token) {
         let url = 'https://api.meetup.com/find/upcoming_events?&sign=true&photo-host=public'
@@ -55,7 +60,12 @@ async function getEvents(lat, lon, page) {
             url += '&page=' + page;
         }
         const result = await axios.get(url);
-        return result.data.events;
+        const events = result.data.events;
+        if (events.length) { // Check if the events exist
+            localStorage.setItem('lastEvents', JSON.stringify(events)); //stringify as localstorage only stores strings
+        }
+
+        return events;
     }
 }
 
@@ -66,31 +76,23 @@ async function getAccessToken() {
         const code = searchParams.get('code');
 
         if (!code) {
-            window.location.href = 'https://secure.meetup.com/oauth2/authorize?client_id=qqqla2dkife1n9ravthtl07ek0&response_type=code&redirect_uri=https://robinnicodemus.github.io';
+            window.location.href = 'https://secure.meetup.com/oauth2/authorize?client_id=qqqla2dkife1n9ravthtl07ek0&response_type=code&redirect_uri=https://robinnicodemus.github.io/meetup';
             return null;
         }
         return getOrRenewAccessToken('get', code);
     }
     const lastSavedTime = localStorage.getItem('last_saved_time');
 
+
+
     if (accessToken && (Date.now() - lastSavedTime < 3600000)) {
         return accessToken;
     }
-    //when aws works, change here:
     // If the access_token is expired, we try to renew it by using refresh_token
-    //const refreshToken = localStorage.getItem('refresh_token');
-    //return getOrRenewAccessToken('renew', refreshToken);
-    else {
-        const searchParams = new URLSearchParams(window.location.search);
-        const code = searchParams.get('code');
-
-        if (!code) {
-            window.location.href = 'https://secure.meetup.com/oauth2/authorize?client_id=qqqla2dkife1n9ravthtl07ek0&response_type=code&redirect_uri=https://robinnicodemus.github.io';
-            return null;
-        }
-        return getOrRenewAccessToken('get', code);
-    }
+    const refreshToken = localStorage.getItem('refresh_token');
+    return getOrRenewAccessToken('renew', refreshToken);
 }
+
 
 async function getOrRenewAccessToken(type, key) {
     let url;
@@ -99,12 +101,20 @@ async function getOrRenewAccessToken(type, key) {
         url = 'https://8nx24xwj71.execute-api.eu-central-1.amazonaws.com/dev/api/token/'
             + key;
     } else if (type === 'renew') {
+        //The following content was implemented as a workaround, as AWS funcs do not work as expected:
+        //We repeat the steps AS IF we had no valid accesstoken AND no valid Code in the url(the code will be not valid, as it has already been used once)   
+        localStorage.removeItem('access_token');
+        window.location.href = 'https://secure.meetup.com/oauth2/authorize?client_id=qqqla2dkife1n9ravthtl07ek0&response_type=code&redirect_uri=https://robinnicodemus.github.io/meetup';
+        return null;
+
+
+        //  intended original content of the function:
         // Lambda endpoint to get token by refresh_token
         //once the serverless functions work correctly, change to the url below this
-        url = 'https://8nx24xwj71.execute-api.eu-central-1.amazonaws.com/dev/api/token/'
-            //for when everything works:0
-            // url = 'https://8nx24xwj71.execute-api.eu-central-1.amazonaws.com/dev/api/refreshtoken/'
-            + key;
+        // url = 'https://8nx24xwj71.execute-api.eu-central-1.amazonaws.com/dev/api/token/'
+        //for when everything works:
+        //   url = 'https://8nx24xwj71.execute-api.eu-central-1.amazonaws.com/dev/api/refreshtoken/'
+        //       + key;
     }
 
     // Use Axios to make a GET request to the endpoint

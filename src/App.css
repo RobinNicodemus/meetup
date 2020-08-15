@@ -109,7 +109,8 @@ li{
 .eventGroup {
   text-transform: uppercase;
   font-size: 14px;
-  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  max-width: 50%;
 }
 
 .eventFooter {
@@ -164,6 +165,16 @@ li{
 .Alert {
   height: 40px;
   margin: -15px 0;
+}
+
+.attendanceChart {
+  float: right;
+  top: 0;
+  right: 0;
+}
+
+.eventBody {
+  min-height: 160px;
 }
 
 @media only screen and (min-width:  992px) {

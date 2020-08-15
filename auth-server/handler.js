@@ -17,7 +17,9 @@ module.exports.getAccessToken = async (event) => {
   return {
     statusCode: 200,
     headers: {
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
     },
     body: JSON.stringify({
       access_token: info.data.access_token,
@@ -39,7 +41,9 @@ module.exports.refreshAccessToken = async (event) => {
   return {
     statusCode: 200,
     headers: {
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
     },
     body: JSON.stringify({
       access_token: info.data.access_token,
