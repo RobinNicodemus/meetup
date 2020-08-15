@@ -23,6 +23,12 @@ class App extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    if (!navigator.onLine) {
+      this.setState({ warningText: "No network connection. Events are loaded from the previous session." });
+    } else {
+      this.setState({ warningText: "" });
+    }
+
     getEvents().then(response => {
       if (this._isMounted) {
         this.setState({ events: response });
@@ -40,12 +46,21 @@ class App extends Component {
     } else {
       this.setState({ warningText: "" })
     }
-    if (lat && lon) {
+    if (page) {
+      getEvents(this.state.lat, this.state.lon, page).then(events => this.setState({ events }));
+    } else {
       getEvents(lat, lon, this.state.page).then(events =>
         this.setState({ events, lat, lon })
       );
-      getEvents(this.state.lat, this.state.lon, page).then(events => this.setState({ events }));
     }
+
+    //  if (lat && lon) {
+    //    getEvents(lat, lon, this.state.page).then(events =>
+    //      this.setState({ events, lat, lon })
+    //    );
+    //  } else { 
+    //    getEvents(this.state.lat, this.state.lon, page).then(events => this.setState({ events }));
+    //  }
   }
 
   updatePage = (page) => {
@@ -82,7 +97,7 @@ class App extends Component {
     return (
       <div className="App">
         {this.state.warningText && <WarningAlert text={this.state.warningText} />}
-        <CitySearch updateEvents={this.updateEvents} />
+        <CitySearch updateEvents={this.updateEvents} page={this.state.page} />
         <NumberOfEvents updatePage={this.updatePage} />
         <ResponsiveContainer height={400}>
           <ScatterChart

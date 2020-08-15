@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { PieChart, Pie, Legend, Tooltip, Cell, ResponsiveContainer, LabelList } from 'recharts';
+import { PieChart, Pie, Legend, Tooltip, Cell, ResponsiveContainer } from 'recharts';
 class Event extends Component {
     state = {
         showDetails: false,
